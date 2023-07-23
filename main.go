@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/spf13/pflag"
+	"github.com/tmgasek/go-wc/counters"
 )
 
 // handle flags -lwc
@@ -26,10 +27,10 @@ import (
 type Operation func(data []byte) int
 
 var operations = map[string]Operation{
-	"l": countNewlines,
-	"w": countWords,
-	"c": countBytes,
-	"m": countChars,
+	"l": counters.CountNewlines,
+	"w": counters.CountWords,
+	"c": counters.CountBytes,
+	"m": counters.CountChars,
 }
 
 func main() {

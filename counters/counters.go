@@ -1,15 +1,15 @@
-package main
+package counters
 
 import (
 	"unicode"
 	"unicode/utf8"
 )
 
-func countBytes(data []byte) int {
+func CountBytes(data []byte) int {
 	return len(data)
 }
 
-func countNewlines(data []byte) int {
+func CountNewlines(data []byte) int {
 	count := 0
 	for _, b := range data {
 		if b == '\n' {
@@ -20,7 +20,7 @@ func countNewlines(data []byte) int {
 	return count
 }
 
-func countWords(data []byte) int {
+func CountWords(data []byte) int {
 	count := 0
 	inWord := false
 	for _, b := range data {
@@ -42,6 +42,6 @@ func countWords(data []byte) int {
 	return count
 }
 
-func countChars(data []byte) int {
+func CountChars(data []byte) int {
 	return utf8.RuneCount(data)
 }
