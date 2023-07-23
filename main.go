@@ -1,9 +1,11 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	"log"
 	"os"
+
+	"github.com/spf13/pflag"
 )
 
 // handle flags -lwc
@@ -20,7 +22,7 @@ import (
 // by default, it does newline, word, byte
 // order: newline, word, char, byte, max line length
 
-type Operation func(data *[]byte) int
+type Operation func(data []byte) int
 
 var operations = map[string]Operation{
 	"l": countNewlines,
@@ -30,17 +32,25 @@ var operations = map[string]Operation{
 }
 
 func main() {
-	linesFlag := flag.Bool("l", false, "print the newline counts")
-	wordsFlag := flag.Bool("w", false, "print the word counts")
-	bytesFlag := flag.Bool("c", false, "print the byte counts")
-	charsFlag := flag.Bool("m", false, "print the character counts")
+	var linesFlag bool
+	var wordsFlag bool
+	var charsFlag bool
+	var bytesFlag bool
+	pflag.BoolVarP(&linesFlag, "lines", "l", false, "count lines")
+	pflag.BoolVarP(&wordsFlag, "words", "w", false, "count words")
+	pflag.BoolVarP(&charsFlag, "chars", "c", false, "count bytes")
+	pflag.BoolVarP(&bytesFlag, "bytes", "m", false, "count chars")
+	pflag.Parse()
 
-	flag.Parse()
+	args := pflag.Args()
 
-	args := flag.Args()
+	if (len(args) == 0) || (len(args) > 2) {
+		log.Fatal("Usage: wc [-clmw] [file]")
+	}
 
 	if len(args) != 1 {
-		panic("expected one file")
+		log.Fatal("expected one file")
+
 	}
 
 	file := args[0]
@@ -48,23 +58,23 @@ func main() {
 	// read in file
 	data, err := os.ReadFile(file)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	flags := map[string]bool{
-		"l": *linesFlag,
-		"w": *wordsFlag,
-		"c": *bytesFlag,
-		"m": *charsFlag,
+		"l": linesFlag,
+		"w": wordsFlag,
+		"c": bytesFlag,
+		"m": charsFlag,
 	}
 
 	var output string
 
 	for flag, operation := range operations {
 		if flags[flag] {
-			output += fmt.Sprintf("%v %s \t", operation(&data), flag)
+			output += fmt.Sprintf("%v \t", operation(data))
 		}
 	}
 
-	fmt.Printf("%v\n", output)
+	fmt.Printf("%v\n", output+file)
 }
